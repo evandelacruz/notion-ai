@@ -1,6 +1,6 @@
-# Notion Page Indexer
+# Notion Knowledge Base Search
 
-A Python service that indexes Notion pages in a local MeiliSearch instance for fast, local search capabilities.
+A Python service that indexes Notion pages in a local MeiliSearch instance and provides an intelligent search interface powered by LLMs.
 
 ## Features
 
@@ -10,6 +10,8 @@ A Python service that indexes Notion pages in a local MeiliSearch instance for f
 - Smart content extraction including headings and paragraphs
 - Parent-child page relationship tracking
 - LLM-powered question answering using indexed content
+- Interactive CLI for natural language queries
+- Context-aware responses based on indexed content
 
 ## Prerequisites
 
@@ -56,12 +58,24 @@ SYNC_INTERVAL_MINUTES=60
 
 ## Usage
 
+### Indexing Your Notion Pages
+
+(MeiliSearch must be running)
+
 1. Start the sync service to index your Notion pages:
 ```bash
 python -m src.sync.sync_service
 ```
 
-2. Query your knowledge base using the CLI:
+2. To clear and recreate the index (if needed):
+```bash
+python -m src.clear_index
+```
+
+### Searching Your Knowledge Base
+
+Use the CLI to ask questions about your indexed content:
+
 ```bash
 # Using command line argument
 python -m src.cli "What is the company's policy on remote work?"
@@ -72,24 +86,53 @@ What is the company's policy on remote work?
 Please include any specific requirements or exceptions.
 EOF
 
-# With custom parameters
-python -m src.cli --model gpt-4 --max-context 8000 --temperature 0.5 "Your question here"
+# Interactive mode (just run without arguments)
+python -m src.cli
 ```
 
-The service will:
-- Initialize the MeiliSearch index
-- Fetch all pages from your Notion workspace
-- Index them in MeiliSearch
-- Continue syncing at the configured interval
+#### CLI Options
+
+The CLI supports several customization options:
+
+```bash
+python -m src.cli [options] [question]
+
+Options:
+  --model MODEL           OpenAI model to use (default: gpt-3.5-turbo)
+  --max-context LENGTH    Maximum context length in characters (default: 40000)
+  --temperature TEMP      Temperature for LLM generation (default: 0.7)
+```
+
+### How It Works
+
+1. **Indexing Process**:
+   - The sync service fetches all pages from your Notion workspace
+   - Content is extracted and processed
+   - Pages are indexed in MeiliSearch with their hierarchy and relationships
+   - Continuous sync keeps the index up to date
+
+2. **Search Process**:
+   - Your question is analyzed to extract key search terms
+   - MeiliSearch finds relevant content from your knowledge base
+   - The LLM processes the context and generates a natural language response
+   - Responses are based on actual content from your Notion pages
+
+## Development Notes
+
+- Always ensure MeiliSearch is running in the background:
+```bash
+meilisearch --master-key your-master-key
+```
+
+- The service uses a combination of MeiliSearch for fast content retrieval and OpenAI's LLM for natural language understanding
+- Search results are optimized for relevance using custom ranking rules and typo tolerance
+- The system maintains page hierarchies to provide context-aware responses
 
 ## Future Enhancements
 
-This module is designed to be extended with:
 - Webhook-based real-time updates
 - Advanced search capabilities
 - Page relationship visualization
 - Support for additional LLM providers
-
-When testing and developing etc remember you need meilisearch running in background
-
-`meilisearch --master-key your-master-key`
+- Web interface for searching
+- Batch processing for large workspaces
