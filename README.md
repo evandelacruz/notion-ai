@@ -1,6 +1,6 @@
 # Notion Knowledge Base Search
 
-A Python service that indexes Notion pages in a local MeiliSearch instance and provides an intelligent search interface powered by LLMs.
+A Python service that indexes Notion pages in a local MeiliSearch instance and provides an intelligent search interface powered by LLMs. Includes both CLI and Slack bot interfaces.
 
 ## Features
 
@@ -11,6 +11,7 @@ A Python service that indexes Notion pages in a local MeiliSearch instance and p
 - Parent-child page relationship tracking
 - LLM-powered question answering using indexed content
 - Interactive CLI for natural language queries
+- Slack bot integration for team-wide access
 - Context-aware responses based on indexed content
 
 ## Prerequisites
@@ -19,6 +20,7 @@ A Python service that indexes Notion pages in a local MeiliSearch instance and p
 2. MeiliSearch installed locally
 3. Notion API key with access to your workspace
 4. OpenAI API key (for LLM functionality)
+5. Slack Bot Token (for Slack integration)
 
 ## Setup
 
@@ -53,6 +55,7 @@ NOTION_WORKSPACE_ID=your_workspace_id_here
 MEILISEARCH_HOST=http://localhost:7700
 MEILISEARCH_KEY=your_master_key_here
 OPENAI_API_KEY=your_openai_api_key_here
+SLACK_BOT_TOKEN=xoxb-your-bot-token-here
 SYNC_INTERVAL_MINUTES=60
 ```
 
@@ -74,6 +77,8 @@ python -m src.clear_index
 
 ### Searching Your Knowledge Base
 
+#### CLI Interface
+
 Use the CLI to ask questions about your indexed content:
 
 ```bash
@@ -89,6 +94,32 @@ EOF
 # Interactive mode (just run without arguments)
 python -m src.cli
 ```
+
+#### Slack Bot Interface
+
+1. Start the server:
+```bash
+python -m src.server
+```
+
+2. Expose the server to the internet (for testing):
+```bash
+ngrok http 8000
+```
+
+3. Configure your Slack app:
+   - Go to your Slack App settings
+   - Under "Event Subscriptions":
+     - Enable events
+     - Add your ngrok URL + "/slack/events" as the Request URL
+     - Subscribe to the `message.im` bot event
+   - Under "OAuth & Permissions":
+     - Add the following bot token scopes:
+       - `chat:write`
+       - `im:history`
+       - `im:write`
+
+4. Users can now DM the bot with their questions, and it will respond with relevant information from your Notion knowledge base.
 
 #### CLI Options
 
@@ -136,3 +167,4 @@ meilisearch --master-key your-master-key
 - Support for additional LLM providers
 - Web interface for searching
 - Batch processing for large workspaces
+- Additional Slack bot features (threading, reactions, etc.)

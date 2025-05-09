@@ -2,6 +2,7 @@ notion-client==2.3.0
 meilisearch==0.34.1
 python-dotenv==1.0.0
 pydantic==2.6.1
-fastapi==0.109.2
-uvicorn==0.27.1
+fastapi>=0.68.0
+uvicorn>=0.15.0
+aiohttp>=3.8.0
 openai==1.76.2

@@ -43,18 +43,22 @@ class NotionClient:
     def fetch_and_index_all_pages(self, index_pages_callback):
         try:
             added_count = 0
-            for page in iterate_paginated_api(self.client.search):
+            for page in iterate_paginated_api(self.client.search, filter={"property": "object", "value": "page"}):
                 print(f"\nPage {page['id']}:")                
                 if not is_full_page(page):
                     print("Skipping page {page['id']} - not a full page")
                     continue
-                if "parent" in page and page["parent"]["type"] == "database_id":
-                    print("Skipping page {page['id']} - parent is a database")
-                    continue
+
+                # if "parent" in page and page["parent"]["type"] == "database_id":
+                #     print("Skipping page {page['id']} - parent is a database")
+                #     continue
                 # Get page content
                 try:
-                    content = self._get_page_content(page)
                     page_name = self._get_page_name(page)
+                    if page_name == "unknown":
+                        print("Skipping page {page['id']} - unknown page name")
+                        continue
+                    content = self._get_page_content(page)
                     hierarchy = self._get_page_hierarchy(page)
 
                     doc = {
@@ -104,12 +108,15 @@ class NotionClient:
             elif "Page" in page["properties"]:
                 page_name = page["properties"]["Page"]["title"][0]["plain_text"]
             elif "title" in page["properties"]:
-                page_name = page["properties"]["title"]["title"][0]["plain_text"]
+                if "title" in page["properties"]["title"]:
+                    page_name = page["properties"]["title"]["title"][0]["plain_text"]
+                elif isinstance(page["properties"]["title"], str):
+                    page_name = page["properties"]["title"]
+                else:
+                    page_name = "unknown"
             elif "Name" in page["properties"]:
                 page_name = page["properties"]["Name"]["title"][0]["plain_text"]               # Get page hierarch
             else:
-                print(page)
-                print("Cannot find page name")
                 page_name = "unknown"
             return page_name
         except Exception as e:

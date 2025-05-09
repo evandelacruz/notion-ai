@@ -9,5 +9,6 @@ class Config:
     MEILISEARCH_KEY = os.getenv("MEILISEARCH_KEY")
     SYNC_INTERVAL_MINUTES = int(os.getenv("SYNC_INTERVAL_MINUTES", "60"))
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+    SLACK_BOT_TOKEN = os.getenv("SLACK_BOT_TOKEN")
 
 config = Config()

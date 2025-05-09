@@ -38,7 +38,7 @@ class LLMService:
 
 User question: {user_prompt}
 
-Please answer the question based on the context provided above. If the context doesn't contain enough information to answer the question, please say so."""
+Please answer the question based on the context provided above. Don't tell me you are answering based on the context; assume I aslready know that you are using the provided context. You can also include your own knowledge if you are certain it pertains to the prompt. If the provided context gives you enough information to at least give a broad response based on what you know, please do so. But if the context doesn't contain enough information to answer the question or at least provide some useful related information, please say you don't know."""
         
         # Generate response using the LLM client
         return self.llm_client.generate(prompt, **kwargs) 
