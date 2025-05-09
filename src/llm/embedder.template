@@ -1,0 +1,8 @@
+{
+  "notion-pages-openai": {
+    "source": "openAi",
+    "model": "text-embedding-3-small",
+    "apiKey": "OPEN_AI_API_KEY",
+    "documentTemplate": "A notion document named '{{doc.hierarchy}}'"
+  }
+}
