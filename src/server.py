@@ -66,15 +66,17 @@ async def handle_slack_event(request: Request, background_tasks: BackgroundTasks
             return {"challenge": body["challenge"]}
         
         # Handle message events
-        if body.get("event", {}).get("type") == "message" and body.get("event", {}).get("channel_type") == "im":
+        event_type = body.get("event", {}).get("type")
+        channel_type = body.get("event", {}).get("channel_type")
+        if (event_type == "message" and channel_type == "im") or (event_type == "app_mention"):
             event = body["event"]
-            
             # Ignore bot messages and message edits/deletions
             if event.get("subtype") in ["bot_message", "message_changed", "message_deleted"]:
                 return JSONResponse(content={"ok": True})
             
             # Ignore messages from the bot itself
             if event.get("bot_id") or event.get("user") == body.get("authorizations", [{}])[0].get("user_id"):
+                print("Ignoring message from bot")
                 return JSONResponse(content={"ok": True})
             
             # Process the message in the background
